@@ -93,6 +93,23 @@ class Solution:
         print(compute(firstWord), compute(secondWord), compute(targetWord))
         return compute(firstWord) + compute(secondWord) == compute(targetWord)
 
+    def addDigits(self, num: int) -> int:
+        while num > 9:
+            temp = 0
+            while num:
+                temp += num % 10
+                num //= 10
+            num = temp
+        return num
+
+    def arrayRankTransform(self, arr: List[int]) -> List[int]:
+        l = list(set(arr))
+        l.sort()
+        mp = {}
+        for idx in range(len(l)):
+            mp[l[idx]] = idx + 1
+        arr = [mp[i] for i in arr]
+        return arr
 s = Solution()
 print(s.isSumEqual(firstWord = "acb", secondWord = "cba", targetWord = "cdb"))
 
