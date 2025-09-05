@@ -59,4 +59,29 @@ class Solution:
             mid = ed + 1
         return  ans
 
+    def minOperations(self, queries: List[List[int]]) -> int:
+        def compute(left, right):
+            k = 0
+            ans = 0
+            temp = 0
+            while 4**k - 1 < left:
+                k+=1
+            while 4**k - 1 < right or left <= right:
+                num = min(4**k-1, right) - left + 1
+                ans += k * num // 2
+                if k * num % 2 == 1:
+                    temp += 1
+                left = 4**k
+                k+=1
+            ans += temp // 2 + temp % 2
+            return ans
+        ans = 0
+        for query in queries:
+            op = query[0]
+            ed = query[1]
+            ans += compute(op, ed)
+        return ans
+
+s = Solution()
+print(s.minOperations( queries = [[2,6]]))
 
