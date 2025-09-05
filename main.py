@@ -82,6 +82,17 @@ class Solution:
             ans += compute(op, ed)
         return ans
 
+    def isSumEqual(self, firstWord: str, secondWord: str, targetWord: str) -> bool:
+
+        def compute(s):
+            temp = ""
+            base = ord('a')
+            for c in s:
+                temp += str(ord(c) - base)
+            return int(temp)
+        print(compute(firstWord), compute(secondWord), compute(targetWord))
+        return compute(firstWord) + compute(secondWord) == compute(targetWord)
+
 s = Solution()
-print(s.minOperations( queries = [[2,6]]))
+print(s.isSumEqual(firstWord = "acb", secondWord = "cba", targetWord = "cdb"))
 
