@@ -110,6 +110,18 @@ class Solution:
             mp[l[idx]] = idx + 1
         arr = [mp[i] for i in arr]
         return arr
+
+    def sumZero(self, n: int) -> List[int]:
+        if n % 2 == 0:
+            k = n // 2
+            arr = list(range(1, k + 1, 1))
+            arr = arr + [-i for i in arr]
+        else:
+            k = (n - 1) // 2
+            arr = list(range(1, k + 1, 1))
+            arr = arr + [-i for i in arr]
+            arr.append(0)
+        return arr
 s = Solution()
 print(s.isSumEqual(firstWord = "acb", secondWord = "cba", targetWord = "cdb"))
 
