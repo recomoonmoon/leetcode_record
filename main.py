@@ -122,6 +122,27 @@ class Solution:
             arr = arr + [-i for i in arr]
             arr.append(0)
         return arr
+
+    def perfectPairs(self, nums: List[int]) -> int:
+        """
+        a = nums[i]，b = nums[j]。那么：
+        min(|a - b|, |a + b|) <= min(|a|, |b|)
+        意味着 如果 a和b同号，|a - b| <= min(|a|, |b|) 大 - 小 <= 小 -》 大 <= 2*小
+              如果 a和b异号 |a + b| <= min(|a|, |b|) 大 - 小 <= 小 -》 大 <= 2*小
+        max(|a - b|, |a + b|) >= max(|a|, |b|)
+        意味着 如果 a和b同号，|a + b| >= max(|a|, |b|) 大 + 小 >= 大 -》 符合条件
+              如果 a和b异号 |a - b| >= max(|a|, |b|) 大 + 小 >= 小 -》 符合条件
+        """
+        n = len(nums)
+        ans = 0
+        for i in range(n-1):
+            for j in range(i+1, n):
+                a = max(abs(nums[i]), abs(nums[j]))
+                b = min(abs(nums[i]), abs(nums[j]))
+                if a <= 2*b:
+                    ans+=1
+        return ans
+
 s = Solution()
 print(s.isSumEqual(firstWord = "acb", secondWord = "cba", targetWord = "cdb"))
 
