@@ -143,6 +143,172 @@ class Solution:
                     ans+=1
         return ans
 
+    def minimumLength(self, s: str) -> int:
+        mp = defaultdict(list)
+        ans = 0
+        for idx, c in enumerate(s):
+            mp[c].append(idx)
+        for key, val in mp.items():
+            if len(val) >= 3:
+                ans += 1 if len(val) % 4 == 1 else 2
+            else:
+                ans += len(val)
+        return ans
+
+    def queryResults(self, limit: int, queries: List[List[int]]) -> List[int]:
+        color_idx = defaultdict(dict)
+        idx_color = defaultdict(int)
+        ans = []
+        color_num = 0
+        for idx, color in queries:
+            if idx not in idx_color:
+                idx_color[idx] = color
+                if len(color_idx[color]) == 0:
+                    color_num += 1
+                color_idx[color][idx] = 1
+                ans.append(color_num)
+            else:
+                old_color =  idx_color[idx]
+                if len(color_idx[old_color]) == 1:
+                    del color_idx[old_color]
+                    color_num -= 1
+                else:
+                    del color_idx[old_color][idx]
+                idx_color[idx] = color
+                if len(color_idx[color]) == 0:
+                    color_num += 1
+                color_idx[color][idx] = 1
+                ans.append(color_num)
+        return ans
+
+    def minimumTeachings(self, n: int, languages: List[List[int]], friendships: List[List[int]]) -> int:
+        record = [0 for _ in range(n+1)]
+
+        for idx, u, v in enumerate(friendships):
+            lenu = len(languages[u])
+            lenv = len(languages[v])
+            unit_languages = set(languages[u] + languages[v])
+            if len(unit_languages) < lenv + lenu:
+                continue
+            else:
+                for i in range(n+1):
+                    if i not in unit_languages:
+                        record[i] += 2
+                    else:
+                        record[i] += 1
+        ans = 0
+        minnum = 9999999999999999
+        for lan, num in enumerate(record):
+            if num < minnum:
+                ans = lan
+                minnum = num
+        return ans
+
+    def sortVowels(self, s: str) -> str:
+        meta = []
+        mp = defaultdict(int)
+        ans = ["" for _ in range(len(s))]
+        for k in "aeiouAEIOU":
+            mp[k] = 1
+        for idx,c in enumerate(s):
+            if mp[c]:
+                meta.append(c)
+            else:
+                ans[idx] = c
+        meta.sort(key=lambda x:ord(x))
+        for idx, c in enumerate(s):
+            if mp[c] == 0:
+                ans[idx] = meta.pop(0)
+        return "".join(ans)
+
+    def largestPalindromic(self, num: str) -> str:
+        record = [0 for _ in range(10)]
+        for n in num:
+            record[int(n)] += 1
+        ans = ""
+        maxnum = ""
+        for i in range(9, -1, -1):
+            if maxnum == "" and record[i] % 2 == 1:
+                maxnum = str(i)
+            ans += str(i) * (record[i]//2)
+        ans += "*"
+        ans = ans.strip("0")
+        ans = ans.strip("*")
+        return ans + maxnum + ans[::-1]
+
+    def minCost(self, maxTime: int, edges: List[List[int]], passingFees: List[int]) -> int:
+        n = len(passingFees)
+        self.min_money_cost = 999999999999999999999
+        self.min_time_cost = 999999999999999999999
+        self.visited = [0 for _ in range(n)]
+        self.mp = defaultdict(dict)
+        for e in edges:
+            self.mp[e[0]][e[1]] = e[2]
+            self.mp[e[1]][e[0]] = e[2]
+        def dfs(root, time_cost, money_cost):
+            self.visited[root] = 1
+            if root == n-1:
+                self.min_money_cost = money_cost
+                return
+            for neighbor in self.mp[root]:
+                if self.visited[neighbor] == 0 and time_cost + self.mp[root][neighbor] <= maxTime and money_cost + passingFees[neighbor] < self.min_money_cost:
+                    dfs(neighbor, time_cost + self.mp[root][neighbor], money_cost + passingFees[neighbor])
+                    self.visited[neighbor] = 0
+
+        dfs(0, 0, passingFees[0])
+        if self.min_money_cost == 999999999999999999999:
+            return -1
+        else:
+            return self.min_money_cost
+
+    def maxFreqSum(self, s: str) -> int:
+        a1 = 0
+        a2 = 0
+        mp = defaultdict(int)
+        for char in s:
+            if char in "aoeiu":
+                mp[char] += 1
+                a1 = max(a1, mp[char])
+            else:
+                mp[char] += 1
+                a2 = max(a2, mp[char])
+        return a1 + a2
+
+    def spellchecker(self, wordlist: List[str], queries: List[str]) -> List[str]:
+        word_temps = defaultdict(str)
+        for idx, word in enumerate(wordlist):
+            temp = ""
+            word1 = word.lower()
+            for c in word1:
+                if c in "aeiou":
+                    temp += "1"
+                else:
+                    temp += c
+            word_temps[temp] = word
+        ans = []
+        for idx, word in enumerate(queries):
+            temp = ""
+            word = word.lower()
+            for c in word:
+                if c in "aeiou":
+                    temp += "1"
+                else:
+                    temp += c
+            ans.append(word_temps[temp])
+        return ans
+
+    def maximumHappinessSum(self, happiness: List[int], k: int) -> int:
+        hp = []
+        for h in happiness:
+            heapq.heappush(hp, -h)
+        ans = 0
+        for i in range(k):
+            temp = heapq.heappop(hp)
+            if -temp - i> 0:
+                ans += -temp - i
+            else:
+                break
+        return ans
 s = Solution()
-print(s.isSumEqual(firstWord = "acb", secondWord = "cba", targetWord = "cdb"))
+print(s.minCost(maxTime = 29, edges = [[0,1,10],[1,2,10],[2,5,10],[0,3,1],[3,4,10],[4,5,15]], passingFees = [5,1,2,20,20,3]))
 
