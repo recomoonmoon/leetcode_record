@@ -297,18 +297,32 @@ class Solution:
             ans.append(word_temps[temp])
         return ans
 
-    def maximumHappinessSum(self, happiness: List[int], k: int) -> int:
-        hp = []
-        for h in happiness:
-            heapq.heappush(hp, -h)
+    def canBeTypedWords(self, text: str, brokenLetters: str) -> int:
+        words = text.split()
+        mp = defaultdict(int)
+        for char in brokenLetters:
+            mp[char] = 1
         ans = 0
-        for i in range(k):
-            temp = heapq.heappop(hp)
-            if -temp - i> 0:
-                ans += -temp - i
-            else:
-                break
+        for word in words:
+            flag = 1
+            for char in word:
+                if mp[char] == 1:
+                    flag = 0
+                    break
+            ans += flag
         return ans
+
+    def digitSum(self, s: str, k: int) -> str:
+        while len(s) > k:
+            op = 0
+            temp = ""
+            while op < len(s):
+                chunk = s[op:min(len(s), op+k)]
+                op += k
+                chunk = str(sum([int(i) for i in chunk]))
+                temp += chunk
+            s = temp
+        return s
 s = Solution()
 print(s.minCost(maxTime = 29, edges = [[0,1,10],[1,2,10],[2,5,10],[0,3,1],[3,4,10],[4,5,15]], passingFees = [5,1,2,20,20,3]))
 
