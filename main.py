@@ -323,6 +323,72 @@ class Solution:
                 temp += chunk
             s = temp
         return s
+
+    def bestHand(self, ranks: List[int], suits: List[str]) -> str:
+        suit_mp = defaultdict(int)
+        rank_mp = defaultdict(int)
+        for r in ranks:
+            rank_mp[r] += 1
+        for s in suits:
+            suit_mp[s] += 1
+
+        for k,v in suit_mp.items():
+            if v == 5:
+                return "Flush"
+        if max(list(rank_mp.values())) >= 3:
+            return "Three of a Kind"
+        elif max(list(rank_mp.values())) >= 2:
+            return "Pair"
+        return "High Card"
+
+    def evaluate(self, s: str) -> int:
+        # Step 1: tokenize
+        stack = []
+        for c in s.replace(" ", ""):  # 去掉空格
+            if c.isdigit():
+                if stack and stack[-1].isdigit():
+                    stack[-1] += c
+                else:
+                    stack.append(c)
+            else:
+                stack.append(c)
+
+        # Step 2: handle * /
+        new_stack = []
+        i = 0
+        while i < len(stack):
+            token = stack[i]
+            if token == "*":
+                prev = int(new_stack.pop())
+                i += 1
+                next_num = int(stack[i])
+                new_stack.append(prev * next_num)
+            elif token == "/":
+                prev = int(new_stack.pop())
+                i += 1
+                next_num = int(stack[i])
+                new_stack.append(int(prev / next_num))  # 向 0 取整
+            else:
+                new_stack.append(token)
+            i += 1
+
+        # Step 3: handle + -
+        res = int(new_stack[0])
+        i = 1
+        while i < len(new_stack):
+            op = new_stack[i]
+            num = int(new_stack[i + 1])
+            if op == "+":
+                res += num
+            else:
+                res -= num
+            i += 2
+
+        return res
+
+
+
+
 s = Solution()
 print(s.minCost(maxTime = 29, edges = [[0,1,10],[1,2,10],[2,5,10],[0,3,1],[3,4,10],[4,5,15]], passingFees = [5,1,2,20,20,3]))
 
