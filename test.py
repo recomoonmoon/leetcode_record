@@ -1,4 +1,6 @@
-a = [1, 2]
-b = a.copy()
-print(a, b)
-print(a + b)
+from collections import Counter
+
+s = "14341141414146666111"
+
+c = Counter(s)
+print(c.most_common(1))

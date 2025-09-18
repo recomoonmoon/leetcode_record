@@ -4,8 +4,7 @@ from bisect import bisect_right,bisect_left
 import math
 import heapq
 from heapq import heappop, heapify, heappush, heappushpop, heapreplace
-
-
+from collections import Counter
 
 class Solution:
 
@@ -386,9 +385,101 @@ class Solution:
 
         return res
 
+    def getMinDistSum(self, positions: List[List[int]]) -> float:
+        xs = [i[0] for i in positions]
+        ys = [i[1] for i in positions]
+        minx = min(xs)
+        maxx = max(xs)
+        miny = min(ys)
+        maxy = max(ys)
+        ans = 999999999999999
+        record = []
+        for i in range(minx, maxx+1):
+            for j in range(miny, maxy+1):
+                temp_xs = [(i - ti)**2 for ti in xs]
+                temp_ys = [(j - tj)**2 for tj in ys]
+                t = math.sqrt(sum([temp_xs[i] + temp_ys[i] for i in range(len(positions))]))
+                if t < ans:
+                    ans = t
+                    record = [i, j]
+        print(record)
+        return ans
 
+    def minOperations(self, nums: List[int]) -> int:
+        def dfs(s:str):
+            if len(s) == 0:
+                return 0
+            elif len(s) == 1:
+                return 1
+            s_list = s.split("0")
+            ans = 0
+            for s in s_list:
+                if len(s) == 0:
+                    continue
+                c = Counter(s)
+                char = c.most_common(1)[0][0]
+                ans += 1
+                lister =  [ i for i in  s.split(char) if i]
+                for new_s in lister:
+                    ans += dfs(new_s)
+            return ans
+        return dfs("".join([str(i) for i in nums]))
 
+    def maxDistance(self, s: str, k: int) -> int:
+        x = [0,0]
+        y = [0,0]
+        ans = 0
+        for idx, c in enumerate(s):
+            if c == "N":
+                y[0] += 1
+            elif c == 'S':
+                y[1] += 1
+            elif c == "W":
+                x[1] += 1
+            else:
+                x[0] += 1
+            minnum = min(x) + min(y)
+            if k >= minnum:
+                ans = max(ans, max(x) + max(y) + minnum)
+            else:
+                ans = max(ans, max(x) + max(y) +2*k - minnum)
+        return ans
 
+    def uniquePaths(self, grid: List[List[int]]) -> int:
+        m = len(grid)
+        n = len(grid[0])
+        if grid[m-1][n-1] == 1:
+            return 0
+        dp = [[0 for _ in range(n)] for _ in range(m)]
+        dp[0][0] = 1
+
+        for i in range(m):
+            for j in range(n):
+                if i + j == 0:
+                    continue
+                else:
+                    if i == 0:
+                        if grid[i][j] == 0:
+                            dp[i][j] += dp[i][j-1]
+                        else:
+                            if i + 1 < m:
+                                dp[i+1][j] += dp[i][j-1]
+                    elif j == 0:
+                        if grid[i][j] == 0:
+                            dp[i][j] += dp[i-1][j]
+                        else:
+                            if j + 1< n:
+                                dp[i][j+1] += dp[i-1][j]
+                    else:
+                        if grid[i][j] == 0:
+                            dp[i][j] += dp[i-1][j] + dp[i][j-1]
+                        else:
+                            if i+1 < m:
+                                #左边来的会变到下面
+                                dp[i+1][j] += dp[i][j-1]
+                            if j+1 < n:
+                                dp[i][j+1] += dp[i-1][j]
+        return dp[m-1][n-1]
 s = Solution()
 print(s.minCost(maxTime = 29, edges = [[0,1,10],[1,2,10],[2,5,10],[0,3,1],[3,4,10],[4,5,15]], passingFees = [5,1,2,20,20,3]))
 
