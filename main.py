@@ -480,6 +480,107 @@ class Solution:
                             if j+1 < n:
                                 dp[i][j+1] += dp[i-1][j]
         return dp[m-1][n-1]
+
+    def bowlSubarrays(self, nums: List[int]) -> int:
+        stack = []
+        ans = 0
+        for idx, num in enumerate(nums):
+            if not stack:
+                stack.append([num, idx])
+            else:
+                while stack and num >= stack[-1][0]:
+                    stack.pop()
+
+                if stack:
+                    gap = idx - stack[-1][1]
+                    if gap > 2:
+                        ans += idx - stack[-1][1] + 1
+                stack.append([num, idx])
+        return ans
+
+    def maxWeight(self, pizzas: List[int]) -> int:
+        times = len(pizzas) // 4
+        pizzas.sort()
+        if times % 2 == 0:
+            right = times//2
+        else:
+            right = times//2 + 1
+        ans = 0
+        for i in range(right):
+            ans += pizzas.pop()
+        for i in range(times//2):
+            pizzas.pop()
+            ans+=pizzas.pop()
+        return ans
+
+    def maxActiveSectionsAfterTrade(self, s: str) -> int:
+        record = []
+        n = len(s)
+        for i in range(n):
+            if s[i] == "0" and (i == 0 or s[i-1] == "1"):
+                record.append(i)
+            if s[i] == "0" and (i==n-1 or s[i+1] == "1"):
+                record.append(i)
+
+
+
 s = Solution()
 print(s.minCost(maxTime = 29, edges = [[0,1,10],[1,2,10],[2,5,10],[0,3,1],[3,4,10],[4,5,15]], passingFees = [5,1,2,20,20,3]))
 
+
+class Spreadsheet:
+
+    def __init__(self, rows: int):
+        self.rows = rows
+        self.sheet = [[0] * 26 for i in range(rows)]
+
+    def setCell(self, cell: str, value: int) -> None:
+        self.self[ord(cell[0]) - ord('A')][int(cell[1:]) - 1] = value
+
+    def resetCell(self, cell: str) -> None:
+        self.self[ord(cell[0]) - ord('A')][int(cell[1:]) - 1] = 0
+
+    def getValue(self, formula: str) -> int:
+        formula = formula[1:]
+        formula = formula.split("+")
+        record = []
+        for f in formula:
+            if f.isdigit():
+                record.append(int(f))
+            else:
+                record.append(self.getValue(f))
+        return sum(record)
+
+    def maxFreeTime(self, eventTime: int, k: int, startTime: List[int], endTime: List[int]) -> int:
+        record = []
+        n = len(endTime)
+        for i in range(n):
+            accu = 0 if not record else record[-1]
+            record.append(endTime[i] - startTime[i] + accu)
+        record.insert(0, 0)
+        record.append(record[-1])
+        startTime.insert(0, 0)
+        startTime.append(eventTime)
+        endTime.insert(0, 0)
+        endTime.append(eventTime)
+        ans = 0
+        n = len(record)
+        for op in range(n):
+            ed = min(n-1, op + k + 1)
+            all_length = endTime[ed] - startTime[op]
+            length = record[ed] - record[max(0, op-1)]
+            ans = max(ans, all_length - length)
+        return ans
+
+    def closestTarget(self, words: List[str], target: str, startIndex: int) -> int:
+        n = len(words)
+        minnum = float("inf")
+
+        for i in range(n):
+            if words[i] == target:
+                # 环形距离：取正向和反向的最小值
+                dist = abs(i - startIndex)
+                dist = min(dist, n - dist)
+                minnum = min(minnum, dist)
+
+        return -1 if minnum == float("inf") else minnum
