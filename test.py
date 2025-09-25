@@ -1,6 +1,7 @@
 from collections import Counter
+from bisect import  *
 
-s = "14341141414146666111"
 
-c = Counter(s)
-print(c.most_common(1))
+s = [[1,2], [1,3], [2,3]]
+
+print(bisect_left(s, [1]))

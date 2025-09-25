@@ -584,3 +584,62 @@ class Spreadsheet:
                 minnum = min(minnum, dist)
 
         return -1 if minnum == float("inf") else minnum
+
+    def countUnguarded(self, m: int, n: int, guards: List[List[int]], walls: List[List[int]]) -> int:
+        record = [[0 for _ in range(n)]for _ in range(m)]
+
+        def guard_dfs(x, y):
+            for temp_y in range(y+1, n, 1):
+                #这个位置有守卫or墙就可以略过了
+                if record[x][temp_y] == -1:
+                    break
+                #这个位置在纵向上横着过去已经有守卫纵向盯着
+                elif record[x][temp_y] == 2 or record[x][temp_y] == 3:
+                    break
+                #这个位置有人横向盯着
+                elif record[x][temp_y] == 1:
+                    record[x][temp_y] = 3
+                else:
+                    record[x][temp_y] = 2
+
+        for w in walls:
+            record[w[0]][w[1]] = -1
+        for g in guards:
+            x = g[0]
+            y = g[1]
+            record[x][y] = -1
+            guard_dfs(x, y)
+        ans = 0
+        for i in range(m):
+            for j in range(n):
+               ans += 1 if record[i][j] == 0 else 0
+        return  ans
+
+    def mostPoints(self, questions: List[List[int]]) -> int:
+        n = len(questions)
+        dp = [[0, 0] for _ in range(n)]
+        """
+        dp[i][0]代表如果在i处于能解决问题的状态，所可以获得的最大分数
+        dp[i][1]代表如果在i处于不能解决问题的状态，所可以获得的最大分数
+        """
+
+        for idx, question in enumerate(questions):
+            if idx == 0:
+                dp[idx][0] = 0
+                dp[idx][1] = question[0]
+            else:
+                dp[idx][0] = max(dp[idx-1][0], dp[idx][0])
+                dp[idx][1] = max(dp[idx-1][1], dp[idx][0] + question[0])
+
+            next_res_idx = idx + question[1] + 1
+            if next_res_idx < n:
+                dp[next_res_idx][0] = max(dp[next_res_idx][0], dp[idx][0] + question[0])
+
+
+        return max(dp[-1])
+# Your MovieRentingSystem object will be instantiated and called as such:
+# obj = MovieRentingSystem(n, entries)
+# param_1 = obj.search(movie)
+# obj.rent(shop,movie)
+# obj.drop(shop,movie)
+# param_4 = obj.report()
