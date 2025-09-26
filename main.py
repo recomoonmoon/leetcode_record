@@ -637,6 +637,19 @@ class Spreadsheet:
 
 
         return max(dp[-1])
+
+    def triangleNumber(self, nums: List[int]) -> int:
+        n = len(nums)
+        ans = 0
+        nums.sort()
+        for i in range(0, n-2, 1):
+            for j in range(i+1, n-1, 1):
+                maxlen = nums[i] + nums[j]
+                target = bisect_left(nums, maxlen)
+                if target > j and nums[i] > 0:
+                    ans += target - j - 1
+        return ans
+
 # Your MovieRentingSystem object will be instantiated and called as such:
 # obj = MovieRentingSystem(n, entries)
 # param_1 = obj.search(movie)
