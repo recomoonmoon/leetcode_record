@@ -650,6 +650,72 @@ class Spreadsheet:
                     ans += target - j - 1
         return ans
 
+    def splitArray(self, nums: List[int]) -> int:
+        split_idx = 0
+        n = len(nums)
+        for i in range(1, n, 1):
+            if nums[i] <= nums[i-1]:
+                split_idx = i
+                break
+        if split_idx == 0:
+            split_idx = n
+        for i in range(split_idx, n, 1):
+            if i > 0 and nums[i] > nums[i-1]:
+                return -1
+
+        if split_idx == n:
+            return abs(sum(nums[:n-1]) - nums[-1])
+        elif split_idx == 1:
+            return abs(sum(nums[1:]) - nums[0])
+        else:
+            ans1 = abs(sum(nums[:split_idx]) - sum(nums[split_idx:]))
+            ans2 = abs(sum(nums[:split_idx-1]) - sum(nums[split_idx-1:]))
+            return min(ans1, ans2)
+
+    def openLock(self, deadends: List[str], target: str) -> int:
+        if target == "0000":
+            return 0
+        record = defaultdict(int)
+        visit = defaultdict(int)
+        for d in deadends:
+            visit[f"{d[0]}{d[1]}{d[2]}{d[3]}"] = 1
+        queue = [[0,0,0,0,0]]
+        while queue:
+            curr = queue.pop(0)
+            a,b,c,d,time = curr[0], curr[1], curr[2], curr[3], curr[4]
+            if f"{a}{b}{c}{d}" == target:
+                record[f"{a}{b}{c}{d}"] = time
+                break
+            if visit[f"{a}{b}{c}{d}"]:
+                continue
+            visit[f"{a}{b}{c}{d}"] = 1
+            record[f"{a}{b}{c}{d}"] = time
+            queue.append([(a+1)%10,b,c,d,time+1])
+            queue.append([(a-1)%10,b,c,d,time+1])
+            queue.append([a,(b+1)%10,c,d,time+1])
+            queue.append([a,(b-1)%10,c,d,time+1])
+            queue.append([a,b,(c+1)%10,d,time+1])
+            queue.append([a,b,(c-1)%10,d,time+1])
+            queue.append([a,b,c,(d+1)%10,time+1])
+            queue.append([a,b,c,(d-1)%10,time+1])
+        if record[target]:
+            return record[target]
+        else:
+            return -1
+
+    def reachNumber(self, target: int) -> int:
+        target = abs(target)
+        accu = 0
+        t = 1
+        while True:
+            accu += t
+            t += 1
+            if accu >= target:
+                if accu - target % 2 == 0:
+                    return t-1
+
+    def orderOfLargestPlusSign(self, n: int, mines: List[List[int]]) -> int:
+
 # Your MovieRentingSystem object will be instantiated and called as such:
 # obj = MovieRentingSystem(n, entries)
 # param_1 = obj.search(movie)
