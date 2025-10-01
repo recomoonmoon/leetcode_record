@@ -714,7 +714,111 @@ class Spreadsheet:
                 if accu - target % 2 == 0:
                     return t-1
 
+    def triangularSum(self, nums: List[int]) -> int:
+        # 1
+        # 1 1
+        # 1 2 1
+        # 1 3 3 1
+        # 1 4 6 4 1
+        # 1 5 10 10 5 1
+        # 1 6 15 20 15 6 1
+        def bfs(nums,  target):
+            if target == len(nums):
+                return nums
+            lister = []
+            for i in range(len(nums)):
+                if i == 1 or i == len(nums) - 1:
+                    lister.append(1)
+                else:
+                    lister.append(nums[i-1] + nums[i])
+            return bfs(lister, target)
+
+        weight = bfs([1], len(nums))
+        accu = 0
+        for i in range(len(nums)):
+            accu = (accu + weight[i] * nums[i]) % 10
+        return accu
+
     def orderOfLargestPlusSign(self, n: int, mines: List[List[int]]) -> int:
+        # 初始化全 1 的矩阵
+        grid = [[1] * n for _ in range(n)]
+        for x, y in mines:
+            grid[x][y] = 0
+
+        left = [[0] * n for _ in range(n)]
+        right = [[0] * n for _ in range(n)]
+        up = [[0] * n for _ in range(n)]
+        down = [[0] * n for _ in range(n)]
+
+        # 计算 left 和 up
+        for i in range(n):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    left[i][j] = 1 + (left[i][j - 1] if j > 0 else 0)
+                    up[i][j] = 1 + (up[i - 1][j] if i > 0 else 0)
+
+        # 计算 right 和 down
+        for i in range(n - 1, -1, -1):
+            for j in range(n - 1, -1, -1):
+                if grid[i][j] == 1:
+                    right[i][j] = 1 + (right[i][j + 1] if j < n - 1 else 0)
+                    down[i][j] = 1 + (down[i + 1][j] if i < n - 1 else 0)
+
+        ans = 0
+        for i in range(n):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    size = min(left[i][j], right[i][j], up[i][j], down[i][j])
+                    ans = max(ans, size)
+        return ans
+
+    def slidingPuzzle(self, board: List[List[int]]) -> int:
+        def get_val(board):
+            board = board[0] + board[1]
+            ans = 0
+            for i in range(6):
+                ans += 10**i * board[i]
+            return ans
+
+        mp = defaultdict(int)
+        q = [[board, 0]]
+        while q:
+            temp_board, time = q.pop(0)
+            val = get_val(temp_board)
+            if val == 54321:
+                return time
+            elif mp[val]:
+                continue
+            else:
+                mp[val] = time + 1
+
+            idx = -1
+            idy = -1
+            for i in range(2):
+                for j in range(3):
+                    if temp_board[i][j] == 0:
+                        idx = i
+                        idy = j
+                        break
+
+            for delta in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                tempx = idx + delta[0]
+                tempy = idy + delta[1]
+                if -1< tempx < 2 and -1< tempy< 3:
+                    tb = [temp_board[0].copy(), temp_board[1].copy()]
+                    tb[idx][idy] = tb[tempx][tempy]
+                    tb[tempx][tempy] = 0
+                    q.append([tb, time+1])
+        return -1
+
+    def numWaterBottles(self, numBottles: int, numExchange: int) -> int:
+        ans = 0
+        water = numBottles
+        while water:
+            ans += water
+            water = numBottles // numExchange
+            numBottles = numBottles // numExchange + numBottles % numExchange
+        return ans
 
 # Your MovieRentingSystem object will be instantiated and called as such:
 # obj = MovieRentingSystem(n, entries)
