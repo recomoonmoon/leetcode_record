@@ -820,6 +820,32 @@ class Spreadsheet:
             numBottles = numBottles // numExchange + numBottles % numExchange
         return ans
 
+    def reachingPoints(self, sx: int, sy: int, tx: int, ty: int) -> bool:
+        while tx > 0 and ty > 0:
+            if tx == sx and ty == sy:
+                return True
+            if tx == ty:
+                return sx == 0 and sy == 0
+            else:
+                if tx > ty:
+                    tx, ty = ty, tx-ty
+                else:
+                    tx, ty = ty - tx, tx
+        return tx == sx and ty == sy
+
+    def maxBottlesDrunk(self, numBottles: int, numExchange: int) -> int:
+        drunked = 0
+        empty = 0
+        flag = True
+        while numBottles:
+            drunked += numBottles
+            numBottles = 0
+            empty += numBottles
+            if empty >= numExchange:
+                numBottles += 1
+                empty -= numExchange
+                numExchange += 1
+        return drunked
 # Your MovieRentingSystem object will be instantiated and called as such:
 # obj = MovieRentingSystem(n, entries)
 # param_1 = obj.search(movie)
