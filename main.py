@@ -846,6 +846,40 @@ class Spreadsheet:
                 empty -= numExchange
                 numExchange += 1
         return drunked
+
+    def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+        m = len(heights)
+        n = len(heights[0])
+        record = [[0] * n for _ in range(m)]
+
+        def dfs(x, y, mode=1):
+            if -1 < x < m and -1 < y < n:
+                if record[x][y] == mode or record[x][y] == 3:
+                    return
+                else:
+                    record[x][y] += mode
+                    for delta in [[-1,0], [1,0], [0,1], [0,-1]]:
+                        tempx = x+delta[0]
+                        tempy = y+delta[1]
+                        if -1 < tempx < m and -1 < tempy < n:
+                            if heights[tempx][tempy] >= heights[x][y]:
+                                dfs(tempx, tempy, mode)
+        for i in range(n):
+            dfs(0, i, 1)
+            dfs(m-1, i, 2)
+        for i in range(m):
+            dfs(i, 0, 1)
+            dfs(i, n-1, 2)
+
+        accu = []
+        for i in range(m):
+            for j in range(n):
+                if record[i][j] == 3:
+                    accu.append([i,j])
+        return accu
+
+
+
 # Your MovieRentingSystem object will be instantiated and called as such:
 # obj = MovieRentingSystem(n, entries)
 # param_1 = obj.search(movie)
