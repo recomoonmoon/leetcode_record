@@ -878,7 +878,41 @@ class Spreadsheet:
                     accu.append([i,j])
         return accu
 
+    def minTime(self, skill: List[int], mana: List[int]) -> int:
+        """
+        1 2 2 3 1 1
+        2 4 4 6 2 2
+        1 2 2 3 1 1
+        """
+        n = len(skill)
+        sum_mana = sum(mana)
+        pre_mana = sum_mana - mana[-1]
+        def compute(pre_sk, post_sk):
+            if pre_sk <= post_sk:
+                return 0
+            else:
+                pre_cost = pre_sk * sum_mana
+                post_cost = post_sk * pre_mana
+                if post_cost >= pre_cost:
+                    return 0
+                else:
+                    return pre_cost - post_cost
 
+
+        pre = -1
+        accu = 0
+        for sk in skill:
+            if pre < 0:
+                pre = sk
+                continue
+            else:
+                bubble = compute(pre, sk)
+                accu += max(pre * mana[0], bubble)
+                pre = sk
+
+        accu += sum_mana * skill[-1]
+        return accu
+    def lenLongestFibSubseq(self, arr: List[int]) -> int:
 
 # Your MovieRentingSystem object will be instantiated and called as such:
 # obj = MovieRentingSystem(n, entries)
