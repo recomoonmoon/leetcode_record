@@ -912,7 +912,35 @@ class Spreadsheet:
 
         accu += sum_mana * skill[-1]
         return accu
-    def lenLongestFibSubseq(self, arr: List[int]) -> int:
+
+    def maximumTotalDamage(self, power: List[int]) -> int:
+        power.sort()
+        mp = defaultdict(int)
+        for p in power:
+            mp[p] += 1
+        keys = list(mp.keys())
+        n = len(power)
+        dp=[[0,0]for _ in range(len(keys))]
+        dp[0][1] = keys[0] * mp[keys[0]]
+        for i in range(1, len(keys)):
+            now_key = keys[i]
+            pre_key = keys[i-1]
+            if now_key - pre_key > 2:
+                dp[i][0] = max(dp[i-1][0], dp[i-1][1])
+                dp[i][1] = max(dp[i-1]) + mp[now_key] * now_key
+            else:
+                free_key_idx = i-2
+                while free_key_idx >= 0 and now_key - keys[free_key_idx] <= 2:
+                    free_key_idx -= 1
+                if free_key_idx > -1:
+                    dp[i][0] = max(dp[i-1][0], dp[free_key_idx][1])
+                    dp[i][1] = max(dp[free_key_idx]) + mp[now_key] * now_key
+                else:
+                    dp[i][0] = dp[i - 1][0]
+                    dp[i][1] = mp[now_key] * now_key
+        return max(i[1] for i in dp)
+
+    def expressiveWords(self, s: str, words: List[str]) -> int:
 
 # Your MovieRentingSystem object will be instantiated and called as such:
 # obj = MovieRentingSystem(n, entries)
