@@ -523,34 +523,6 @@ class Solution:
                 record.append(i)
 
 
-
-s = Solution()
-print(s.minCost(maxTime = 29, edges = [[0,1,10],[1,2,10],[2,5,10],[0,3,1],[3,4,10],[4,5,15]], passingFees = [5,1,2,20,20,3]))
-
-
-class Spreadsheet:
-
-    def __init__(self, rows: int):
-        self.rows = rows
-        self.sheet = [[0] * 26 for i in range(rows)]
-
-    def setCell(self, cell: str, value: int) -> None:
-        self.self[ord(cell[0]) - ord('A')][int(cell[1:]) - 1] = value
-
-    def resetCell(self, cell: str) -> None:
-        self.self[ord(cell[0]) - ord('A')][int(cell[1:]) - 1] = 0
-
-    def getValue(self, formula: str) -> int:
-        formula = formula[1:]
-        formula = formula.split("+")
-        record = []
-        for f in formula:
-            if f.isdigit():
-                record.append(int(f))
-            else:
-                record.append(self.getValue(f))
-        return sum(record)
-
     def maxFreeTime(self, eventTime: int, k: int, startTime: List[int], endTime: List[int]) -> int:
         record = []
         n = len(endTime)
@@ -941,10 +913,144 @@ class Spreadsheet:
         return max(i[1] for i in dp)
 
     def expressiveWords(self, s: str, words: List[str]) -> int:
+        ans = 0
+        def extract_word(word:str):
+            stack = []
+            for c in word:
+                if not stack:
+                    stack.append([c, 1])
+                else:
+                    if c == stack[-1][0]:
+                        stack[-1][1] += 1
+                    else:
+                        stack.append([c, 1])
+            return stack
 
-# Your MovieRentingSystem object will be instantiated and called as such:
-# obj = MovieRentingSystem(n, entries)
-# param_1 = obj.search(movie)
-# obj.rent(shop,movie)
-# obj.drop(shop,movie)
-# param_4 = obj.report()
+        template = extract_word(s)
+        n = len(template)
+        for word in words:
+            word_stack = extract_word(word)
+            if len(word_stack) != len(template):
+                continue
+            else:
+                flag = True
+                for i in range(n):
+                    if word_stack[i][0] != template[i][0] or (template[i][1] > word_stack[i][1] and template[i][1] < 3) or template[i][1] < word_stack[i][1]:
+                        flag = False
+                        break
+                if flag:
+                    ans += 1
+        return ans
+    def lengthLongestPath(self, input: str) -> int:
+        stack = []
+        lines = input.split(r"\n")
+        max_length = 0
+        def count_t(s:str):
+            n = len(s)
+            ans = 0
+            for i in range(0, n-1, 2):
+                if s[i:i+2] == r'\t':
+                    ans += 1
+                else:
+                    return ans
+            return ans
+        for line in lines:
+            if not stack:
+                stack.append([0, len(line)])
+            else:
+                t_num = count_t(line)
+                if t_num > stack[-1][0]:
+                    stack.append([t_num, len(line)-2*t_num])
+                elif t_num == stack[-1][0]:
+                    stack[-1] = [t_num, len(line)-2*t_num]
+                else:
+                    while stack[-1][0] >= t_num:
+                        stack.pop()
+                    stack.append([t_num, len(line)-2*t_num])
+
+                if "." in line:
+                    temp = 0
+                    for i in stack:
+                        temp += i[1] + 1
+                    temp -= 1
+                    max_length = max(max_length, temp)
+            print(stack)
+            print(f"Max Length: {max_length}")
+        return max_length
+
+    def removeAnagrams(self, words: List[str]) -> List[str]:
+        stack = []
+        def get_dict(word:str):
+            mp = defaultdict(int)
+            for c in word:
+                mp[c] += 1
+            return mp
+        def juege(mp1, mp2):
+            if len(mp1) != len(mp2):
+                return False
+            for k in mp1.keys():
+                if k not in mp2 or mp1[k] != mp2[k]:
+                    return False
+            return True
+        ans = []
+        for word in words:
+            if not stack:
+                stack.append(get_dict(word))
+                ans.append(word)
+            else:
+                temp = get_dict(word)
+                if juege(temp, stack[-1]):
+                    continue
+                else:
+                    stack.append(temp)
+                    ans.append(word)
+        return ans
+
+    def findSmallestInteger(self, nums: List[int], value: int) -> int:
+        record = [0 for _ in range(value)]
+        for num in nums:
+            record[num % value] += 1
+        k = min(record)
+        base = k * value - 1
+        for i in range(value):
+            if record[i % value] > k:
+                base += 1
+            else:
+                break
+        return base + 1
+
+    def minCost(self, arr: List[int], brr: List[int], k: int) -> int:
+        n = len(arr)
+        ans = sum([abs(arr[i] - brr[i]) for i in range(n)])
+        arr.sort()
+        brr.sort()
+        ans = min(ans, k + sum([abs(arr[i] - brr[i]) for i in range(n)]))
+        return ans
+
+    def maximumAmount(self, coins: List[List[int]]) -> int:
+        m = len(coins)
+        n = len(coins[0])
+        dp = [[[0,0,0]for _ in range(n)] for _ in range(m)]
+
+
+        for i in range(m):
+            for j in range(n):
+                if i == j == 0:
+                    dp[0][0][0] = coins[0][0]
+                    dp[0][0][1] = abs(coins[0][0])
+                    dp[0][0][2] = abs(coins[0][0])
+                else:
+                    if i == 0:
+                        dp[i][j][0] = dp[i][j-1][0] + coins[i][j]
+                        dp[i][j][1] = max(dp[i][j-1][0] + abs(coins[i][j]), dp[i][j-1][1] + coins[i][j])
+                        dp[i][j][2] = max(dp[i][j-1][1] + abs(coins[i][j]), dp[i][j-1][2] + coins[i][j])
+                    elif j == 0:
+                        dp[i][j][0] = dp[i-1][j][0] + coins[i][j]
+                        dp[i][j][1] = max(dp[i-1][j][0] + abs(coins[i][j]), dp[i-1][j][1] + coins[i][j])
+                        dp[i][j][2] = max(dp[i-1][j][1] + abs(coins[i][j]), dp[i-1][j][2] + coins[i][j])
+                    else:
+                        dp[i][j][0] = max(dp[i-1][j][0], dp[i][j-1][0]) + coins[i][j]
+                        dp[i][j][1] = max([max(dp[i-1][j][0], dp[i][j-1][0]) + abs(coins[i][j]), dp[i-1][j][1] + coins[i][j], dp[i][j-1][1]+coins[i][j]])
+                        dp[i][j][2] = max([max(dp[i-1][j][1], dp[i][j-1][1]) + abs(coins[i][j]), dp[i-1][j][2] + coins[i][j], dp[i][j-1][2]+coins[i][j]])
+
+        return dp[-1][-1][2]
