@@ -1054,3 +1054,50 @@ class Solution:
                         dp[i][j][2] = max([max(dp[i-1][j][1], dp[i][j-1][1]) + abs(coins[i][j]), dp[i-1][j][2] + coins[i][j], dp[i][j-1][2]+coins[i][j]])
 
         return dp[-1][-1][2]
+
+    def furthestDistanceFromOrigin(self, moves: str) -> int:
+        record = 0
+        accu = 0
+        ans = 0
+        for m in moves:
+            if m == "L":
+                record -= 1
+            elif m == "R":
+                record += 1
+            else:
+                accu += 1
+            ans = max(accu + abs(record), ans)
+        return ans
+    def maxPartitionsAfterOperations(self, s: str, k: int) -> int:
+        def dfs(i: int, mask: int, changed: bool) -> int:
+            if i == len(s):
+                return 1
+
+            # 不改 s[i]
+            bit = 1 << (ord(s[i]) - ord('a'))
+            new_mask = mask | bit
+            if new_mask.bit_count() > k:
+                # 分割出一个子串，这个子串的最后一个字母在 i-1
+                # s[i] 作为下一段的第一个字母，也就是 bit 作为下一段的 mask 的初始值
+                res = dfs(i + 1, bit, changed) + 1
+            else:  # 不分割
+                res = dfs(i + 1, new_mask, changed)
+            if changed:
+                return res
+
+            # 枚举把 s[i] 改成 a,b,c,...,z
+            for j in range(26):
+                new_mask = mask | (1 << j)
+                if new_mask.bit_count() > k:
+                    # 分割出一个子串，这个子串的最后一个字母在 i-1
+                    # j 作为下一段的第一个字母，也就是 1<<j 作为下一段的 mask 的初始值
+                    res = max(res, dfs(i + 1, 1 << j, True) + 1)
+                else:  # 不分割
+                    res = max(res, dfs(i + 1, new_mask, True))
+            return res
+
+        return dfs(0, 0, False)
+
+
+s = Solution()
+print(s.maxPartitionsAfterOperations("aabcacc", 2))
