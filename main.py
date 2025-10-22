@@ -1098,6 +1098,92 @@ class Solution:
 
         return dfs(0, 0, False)
 
+    def finalValueAfterOperations(self, operations: List[str]) -> int:
+        num = 0
+        for operation in operations:
+            if operation[0] == "-" or operation[2] == "-":
+                num -= 1
+            else:
+                num += 1
+        return  num
+
+    def maxFrequency(self, nums: List[int], k: int, numOperations: int) -> int:
+        nums.sort()
+
+
+    def findMaximumScore(self, nums: List[int]) -> int:
+        stack = []
+        ans = 0
+        for idx, num in enumerate(nums):
+            if not stack:
+                stack.append([num, idx])
+            else:
+                if num > stack[0][0]:
+                    ans += (idx - stack[-1][1]) * stack[-1][0]
+                    stack.pop()
+                    stack.append([num, idx])
+                else:
+                    pass
+        if stack:
+            ans += stack[-1][0] * (len(nums) - 1 - stack[-1][1])
+        return ans
+
+    def removeSubstring(self, s: str, k: int) -> str:
+        stack = []
+        for c in s:
+            if not stack:
+                stack.append([c, 1])
+            else:
+                if c == stack[-1][0]:
+                    stack.append([c, stack[-1][1] + 1])
+                else:
+                    stack.append([c, 1])
+                if c == ")" and stack[-1][1] == k and len(stack) >= 2*k and stack[-k-1][0] == "(" and stack[-k-1][1] >= k:
+                    for _ in range(2*k):
+                        stack.pop()
+        return "".join([i[0] for i in stack])
+
+    def distinctPoints(self, s: str, k: int) -> int:
+        record = [0, 0]
+        mp = defaultdict(str)
+        def compute(c):
+            if c == "U":
+                return [0, 1]
+            elif c == "D":
+                return [0, -1]
+            elif c == "L":
+                return [1, 0]
+            else:
+                return [-1, 0]
+
+        for i in range(k):
+            temp = compute(s[i])
+            record[0] += temp[0]
+            record[1] += temp[1]
+        mp[f"{record[0]}-{record[1]}"] = 1
+        for i in range(k, len(s), 1):
+            temp = compute(s[i-k])
+            record[0] -= temp[0]
+            record[1] -= temp[1]
+            temp = compute(s[i])
+            record[0] += temp[0]
+            record[1] += temp[1]
+            mp[f"{record[0]}-{record[1]}"] = 1
+
+        return len(mp)
+
+    def climbStairs(self, n: int, costs: List[int]) -> int:
+        dp = [0 for _ in range(n)]
+        dp[0] = costs[0] + 1
+        if n > 1:
+            dp[1] = min(dp[0] + 1,  4) + costs[1]
+        if n > 2:
+            dp[2] = min(9, dp[0]+4, dp[1]+1) + costs[2]
+
+        for i in range(3, n, 1):
+            dp[i] = min([dp[i-1] + 1,  dp[i-2] + 4, dp[i-3] + 9]) + costs[i]
+
+        return dp[-1]
 
 s = Solution()
-print(s.maxPartitionsAfterOperations("aabcacc", 2))
+print(s.removeSubstring(s = "((()))()()()", k = 1))
