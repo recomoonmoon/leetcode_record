@@ -1185,5 +1185,56 @@ class Solution:
 
         return dp[-1]
 
+    def maxTotalValue(self, nums: List[int], k: int) -> int:
+        n = len(nums)
+        minnum = 99999999999999
+        maxnum = -99999999999999
+        for i in range(n):
+            minnum = min(minnum, nums[i])
+            maxnum = max(maxnum, nums[i])
+        return (maxnum - minnum) * k
+
+    def maxTotalReward(self, rewardValues: List[int]) -> int:
+        rewardValues.sort()
+        n = len(rewardValues)
+        dp = [0 for _ in range(n)]
+        dp[0] = rewardValues[0]
+        for i in range(1, n):
+            idx = bisect_left(a=dp[:i], x=rewardValues[i])
+            if rewardValues[i]:
+                idx -= 1
+            if idx > -1:
+                dp[i] = dp[idx] + rewardValues[i]
+            else:
+                dp[i] = rewardValues[i]
+            print(idx)
+            print(dp)
+        return max(dp)
+
+    def hasSameDigits(self, s: str) -> bool:
+        def exchange(nums):
+
+            n = len(nums)
+            ans = []
+            for i in range(0, n-1, 1):
+                ans.append( (nums[i] + nums[i+1])%10 )
+            return ans
+
+        nums = [int(i)for i in s]
+        while len(nums) > 2:
+            nums = exchange(nums)
+        return nums[0] == nums[1]
+
+    def leftRightDifference(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        left = [0 for _ in range(n)]
+        right = [0 for _ in range(n)]
+        for i in range(1, n):
+            left[i] = nums[i - 1] + left[i - 1]
+        for i in range(n - 2, -1, -1):
+            right[i] = nums[i + 1] + right[i + 1]
+        ans = [abs(left[i] - right[i]) for i in range(n)]
+        return ans
+
 s = Solution()
-print(s.removeSubstring(s = "((()))()()()", k = 1))
+print(s.maxTotalReward( [1,6,4,3,2]))
