@@ -1236,5 +1236,20 @@ class Solution:
         ans = [abs(left[i] - right[i]) for i in range(n)]
         return ans
 
+    def divisibilityArray(self, word: str, m: int) -> List[int]:
+        col = ""
+        ans = []
+        for i in range(len(word)):
+            col += word[i]
+            if int(col) % m == 0:
+                ans.append(1)
+                col = ""
+            else:
+                ans.append(0)
+        return ans
+
+    def maxNumOfMarkedIndices(self, nums: List[int]) -> int:
+
+
 s = Solution()
 print(s.maxTotalReward( [1,6,4,3,2]))
