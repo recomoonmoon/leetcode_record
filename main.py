@@ -1248,8 +1248,79 @@ class Solution:
                 ans.append(0)
         return ans
 
-    def maxNumOfMarkedIndices(self, nums: List[int]) -> int:
+    def minMaxDifference(self, num: int) -> int:
+        s = [i for i in str(num)]
+        n = len(s)
+        minnum = []
+        maxnum = []
+        for i in range(n):
+            if minnum and maxnum:
+                return int("".join(maxnum)) - int("".join(minnum))
+            else:
+                if s[i] != "0" and not minnum:
+                    minnum = [char if char != s[i] else "0" for char in s ]
+                if s[i] != "9" and not maxnum:
+                    maxnum = [char if char != s[i] else "9" for char in s ]
+        if not maxnum:
+            maxnum = s
+        if not minnum:
+            minnum = s
+        return int("".join(maxnum)) - int("".join(minnum))
 
+    def countVowelStrings(self, n: int) -> int:
+        dp = [[1]*5 for _ in range(n)]
+        for i in range(1, n):
+            for j in range(5):
+                dp[i][j] = sum( dp[i-1][:j+1] )
+        return sum(dp[-1])
 
-s = Solution()
-print(s.maxTotalReward( [1,6,4,3,2]))
+    def generateParenthesis(self, n: int) -> List[str]:
+        dp = ["()"]
+        for i in range(1, n):
+            temp = {}
+            for s in dp:
+                temp[s + "()"] = 1
+                temp[f"({s})"] = 1
+                temp["()" + s] = 1
+            dp = list(temp.keys())
+        return dp
+
+    def countBits(self, n: int) -> List[int]:
+        def compute(num):
+            ans = 0
+            while num:
+                ans += num % 2
+                num //= 2
+            return ans
+        ans = [compute(i) for i in range(n+1)]
+        return ans
+
+    def numberOfBeams(self, bank: List[str]) -> int:
+        ans = 0
+        pre = sum(int(i) for i in bank[0])
+        for i in range(1, len(bank)):
+            temp = sum(int(i) for i in bank[i])
+            if temp == 0:
+                continue
+            else:
+                ans += temp * pre
+                pre = temp
+        return ans
+
+    def totalMoney(self, n: int) -> int:
+        """
+
+        第i个星期， i + 3 块钱
+        第j天
+        :param n:
+        :return:
+        """
+        ans = 0
+        week = n // 7
+        for i in range(week):
+            ans += 7 * (i + 4)
+        day = n % 7
+        for i in range(day):
+            ans += week + 1 + i
+        return ans
+
