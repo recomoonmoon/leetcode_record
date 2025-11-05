@@ -1324,3 +1324,156 @@ class Solution:
             ans += week + 1 + i
         return ans
 
+    def countValidSelections(self, nums: List[int]) -> int:
+        all_accu  = sum(nums)
+        accu = 0
+        n = len(nums)
+        ans = 0
+        for i in range(n):
+            accu += nums[i]
+            if nums[i] == 0 and accu * 2 == all_accu:
+                ans += 2
+            elif nums[i] == 0 and  abs(all_accu - accu * 2) == 1:
+                ans += 1
+        return  ans
+
+    def divisorGame(self, n: int) -> bool:
+        dp = [0 for i in range(n)]
+        if n > 1:
+            dp[1] = 1
+        for i in range(2, n, 1):
+            dp[i] = (dp[i-1] + 1) % 2
+            if dp[i] == 1:
+                continue
+            for j in range(1, i):
+                if (j + 1) % (i + 1) == 0 and dp[i - (j + 1)] == 0:
+                    dp[i] = 1
+                    break
+        return dp[-1] == 1
+
+    def tribonacci(self, n: int) -> int:
+        dp = [0 for _ in range(n+1)]
+        for i in range(1, min(3, n+1), 1):
+            dp[i] = 1
+
+        for i in range(3, n+1, 1):
+            #print(dp)
+            dp[i] = dp[i-1] + dp[i-2] + dp[i-3]
+
+        return dp[-1]
+
+    def minNumberOperations(self, target: List[int]) -> int:
+        """
+        1 3 5 1 2
+        1 0 0 0 1
+
+        :param target:
+        :return:
+        """
+        n = len(target)
+        delta = [target[0] if i == 0 else target[i] - target[i-1] for i in range(n)]
+        stack = 0
+        ans = 0
+        print(delta)
+        for num in delta:
+            if num == 0:
+                continue
+            else:
+                if num * stack < 0:
+                    if abs(stack) >= abs(num):
+                        ans += abs(num)
+                        stack += num
+                    else:
+                        ans += abs(stack)
+                        stack = num + stack
+                else:
+                    stack += num
+        ans += abs(stack)
+        return ans
+
+    def nthSuperUglyNumber(self, n: int, primes: List[int]) -> int:
+        dp = defaultdict(int)
+
+        idx = 1
+        accu = 0
+        q = [1]
+        mp = defaultdict(int)
+        while accu < n:
+            idx = heapq.heappop(q)
+            while mp[idx] == 1:
+                idx = heapq.heappop(q)
+            mp[idx] = 1
+            for num in primes:
+                heapq.heappush(q, num * idx)
+            accu += 1
+        return idx
+
+    def rob(self, nums: List[int]) -> int:
+        n = len(nums)
+        dp = [[0,0] * n]
+        dp[0][1] = nums[0]
+        for i in range(1, n):
+            if i != n-1:
+                dp[i][0] = max(dp[i-1])
+                dp[i][1] = dp[i-1][0] + nums[i]
+            else:
+                dp[i][1] = max(dp[0][0], dp[i-1][0]) + nums[i]
+                dp[i][0] = max(dp[0][1], dp[i-1][1])
+        return max([max(i)for i in dp])
+
+    def minCost(self, colors: str, neededTime: List[int]) -> int:
+        ans = 0
+        q = []
+        n = len(colors)
+        preColor = "-"
+        for i in range(n):
+            if q:
+                if preColor == colors[i]:
+                    heapq.heappush(q, neededTime[i])
+                else:
+                    while len(q) > 1:
+                        ans += heapq.heappop(q)
+            heapq.heappush(q, neededTime[i])
+            preColor = colors[i]
+        return ans
+
+    def integerBreak(self, n: int) -> int:
+        """
+        dp[i][j] = 把 n = i 拆成j份的最大乘积
+        for i in range(n):
+            for j in range(n)
+        :param n:
+        :return:
+        """
+
+        dp = [[0 for _ in range(n+1)] for _ in range(n+1)]
+        for i in range(1, n+1):
+            for j in range(1, n+1):
+                if j == 1:
+                    dp[i][j] = i
+                else:
+                    """
+                    dp[i][j] = max(dp[i-k][j-1] * k)
+                    """
+                    for k in range(1, i+1, 1):
+                        dp[i][j] = max(dp[i][j], dp[i-k][j-1] * k)
+
+                # for d in dp:
+                #     print(d)
+                # print("*"*50)
+        ans = max([dp[n][i] for i in range(2, n + 1)])
+        return ans
+
+    def maxEnvelopes(self, envelopes: List[List[int]]) -> int:
+        n = len(envelopes)
+        dp = [1 for _ in range(n)]
+        envelopes.sort()
+        record = []
+        record.append(envelopes[0])
+        for i in range(2, n):
+            for j in range(i):
+                dp[i] = max(dp[i], dp[j]+1) if envelopes[i][1] > envelopes[j][1] else dp[i]
+        return max(dp)
+
+s = Solution()
+print(s.integerBreak(2))
