@@ -1475,5 +1475,40 @@ class Solution:
                 dp[i] = max(dp[i], dp[j]+1) if envelopes[i][1] > envelopes[j][1] else dp[i]
         return max(dp)
 
+
+    def minOperations(self, nums: List[int]) -> int:
+        """
+        1 3 2 2 3 1
+        [1 3 2 ]
+        :param nums:
+        :return:
+        """
+
+    def findMaxForm(self, strs: List[str], m: int, n: int) -> int:
+        """
+        dp[i][j][k]
+        代表使用 0-i 的时候， m=j， n=k 的时候的最大子集长度
+        dp[i][j][k] = max(dp[-1][j][k], dp[i-1][j-cost][k-cost] + 1)
+        """
+        dp = [[[0 for _ in range(n+1)] for _ in range(m+1)]for _ in range(len(strs) + 1)]
+        ans = 0
+        for i in range(len(strs) + 1):
+            cost = [0, 0]
+            if i > 0:
+                for c in strs[i-1]:
+                    cost[int(c)] += 1
+            for j in range(m+1):
+                for k in range(n+1):
+                    if i > 0:
+                        if j >= cost[0] and k >= cost[1]:
+                            dp[i][j][k] = max(dp[i-1][j][k], dp[i-1][j-cost[0]][k-cost[1]] + 1)
+                        else:
+                            dp[i][j][k] = dp[i - 1][j][k]
+
+        return dp[-1][-1][-1]
+
+    def minOperations(self, nums: List[int]) -> int:
+
+
 s = Solution()
-print(s.integerBreak(2))
+print(s.findMaxForm(strs = ["10", "0", "1"], m = 1, n = 1))
