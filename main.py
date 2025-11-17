@@ -1508,7 +1508,112 @@ class Solution:
         return dp[-1][-1][-1]
 
     def minOperations(self, nums: List[int]) -> int:
+        def gcd_euclidean_iterative(a: int, b: int) -> int:
+            """
+            使用欧几里得算法计算两个整数的最大公约数（迭代版本）
+
+            这是最高效的实现方式，时间复杂度O(log(min(a,b)))
+
+            Args:
+                a (int): 第一个整数
+                b (int): 第二个整数
+
+            Returns:
+                int: a和b的最大公约数，总是非负
+
+            Example:
+                >>> gcd_euclidean_iterative(48, 18)
+                6
+                >>> gcd_euclidean_iterative(-48, 18)  # 处理负数
+                6
+                >>> gcd_euclidean_iterative(0, 5)
+                5
+            """
+            # 处理负数，确保结果总是非负
+            a, b = abs(a), abs(b)
+
+            # 特殊情况处理
+            if a == 0 and b == 0:
+                return 0  # 数学上未定义，但通常返回0
+            if a == 0:
+                return b
+            if b == 0:
+                return a
+
+            # 欧几里得算法
+            while b != 0:
+                a, b = b, a % b
+            return a
+
+        n = len(nums)
+        for i in range(n - 1):
+            a = nums[i]
+            b = nums[i+1]
+            if a == 1 or b == 1:
+                return True
+
+            temp = gcd_euclidean_iterative(a, b)
+            if temp == 1:
+                return n
+        return -1
+
+    def kLengthApart(self, nums: List[int], k: int) -> bool:
+        acc = k + 1
+        for num in nums:
+            if num == 1:
+                if acc >= k:
+                    acc = 0
+                else:
+                    return False
+            else:
+                acc += 1
+        return True
+
+    def maxSales(self, sales: List[int]) -> int:
+        dp = sales.copy()
+        for idx in range(1, len(sales), 1):
+            dp[idx] = max(dp[idx], dp[idx-1] + sales[idx])
+        return max(dp)
+
+    def reverseBits(self, num: int) -> int:
+        def getBinaryList(num: int) -> list:
+            """将32位整数转换为二进制列表（高位在前）"""
+
+            if num < 0:
+                num = (1 << 32) + num
+
+            nums = []
+            for i in range(32):
+                nums.append(num & 1)
+                num >>= 1
+
+            return nums[::-1]
+
+        nums = getBinaryList(num)
+        print(f"二进制表示: {nums}")
+
+        n = len(nums)
+        dp = [[0, 0] for _ in range(n)]
+
+        dp[0][0] = nums[0]
+        dp[0][1] = 1
+
+        ans = max(dp[0][0], dp[0][1])
+
+        for i in range(1, n):
+            if nums[i] == 1:
+
+                dp[i][0] = dp[i - 1][0] + 1
+                dp[i][1] = dp[i - 1][1] + 1
+            else:
+
+                dp[i][0] = 0
+                dp[i][1] = dp[i - 1][0] + 1
+
+            ans = max(ans, dp[i][0], dp[i][1])
+
+        return ans
 
 
 s = Solution()
-print(s.findMaxForm(strs = ["10", "0", "1"], m = 1, n = 1))
+print(s.reverseBits(num = 2147483647))
