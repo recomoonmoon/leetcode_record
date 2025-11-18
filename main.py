@@ -1614,6 +1614,48 @@ class Solution:
 
         return ans
 
+    def isOneBitCharacter(self, bits: List[int]) -> bool:
+        """
+        返回是否必须是 1 bit字符结尾
+        也就是不存在最后以 2 bit 结尾的选项
+        使用dp
+        dp[i][j] 代表 第i个结尾字符是 第j种字符结尾的可能
+        0 - 0
+        1 - 10
+        2 - 11
+        :param bits:
+        :return:
+        """
+        n = len(bits)
+        dp = [[0,0,0] for _ in range(n)]
+        if n == 1:
+            return bits[0] == 0
+        if bits[0] == 0:
+            dp[0][0] = 1
+            if bits[1] == 0:
+                dp[1][0] = 1
+        else:
+            if bits[1] == 0:
+                dp[1][1] = 1
+            else:
+                dp[1][2] = 1
+
+        for i in range(2, n):
+            if bits[i] == 0:
+                if sum(dp[i-1]) > 0:
+                    dp[i][0] = 1
+                if sum(dp[i-2]) > 0 and bits[i-1] == 1:
+                    dp[i][1] = 1
+            else:
+                if bits[i-1] == 1 and  sum(dp[i-2]) > 0:
+                    dp[i][2] = 1
+
+        # for i in dp:
+        #     print(i)
+        return dp[-1][0] == 1 and sum(dp[-1]) == 1
+
+    def numDecodings(self, s: str) -> int:
+
 
 s = Solution()
-print(s.reverseBits(num = 2147483647))
+print(s.isOneBitCharacter(bits = [1,1,1,0]))
