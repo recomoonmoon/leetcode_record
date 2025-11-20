@@ -1655,7 +1655,51 @@ class Solution:
         return dp[-1][0] == 1 and sum(dp[-1]) == 1
 
     def numDecodings(self, s: str) -> int:
+        n = len(s)
+
+        if s[0] == "0":
+            return 0
+        if n == 1:
+            return 1
+
+        dp = [0] * n
+        dp[0] = 1
+        if 0 < int(s[0]) < 2 or int(s[0]) == 2 and int(s[1]) < 7:
+            dp[1] = 1
+
+        if s[1] != "0":
+            dp[1] += 1
+
+
+        for i in range(2, n):
+            if 0<int(s[i-1])<2 or int(s[i-1])==2 and int(s[i]) < 7:
+                dp[i] += dp[i-2]
+            if s[i] != "0":
+                dp[i] += dp[i-1]
+
+        print(dp)
+        return dp[-1]
+
+    def intersectionSizeTwo(self, intervals: List[List[int]]) -> int:
+        intervals.sort(key=lambda x: (x[0], -x[1]))
+        ans, n, m = 0, len(intervals), 2
+        vals = [[] for _ in range(n)]
+        for i in range(n - 1, -1, -1):
+            j = intervals[i][0]
+            for k in range(len(vals[i]), m):
+                ans += 1
+                for p in range(i - 1, -1, -1):
+                    if intervals[p][1] < j:
+                        break
+                    vals[p].append(j)
+                j += 1
+        return ans
+
+
+
+
+
 
 
 s = Solution()
-print(s.isOneBitCharacter(bits = [1,1,1,0]))
+print(s.numDecodings("226"))
