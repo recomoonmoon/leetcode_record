@@ -1695,11 +1695,19 @@ class Solution:
                 j += 1
         return ans
 
+    def countPalindromicSubsequence(self, s: str) -> int:
+        left_mp = defaultdict(int)
+        right_mp = defaultdict(int)
+        for c in s:
+            right_mp[c] += 1
+        ans = defaultdict(int)
+        for c in s:
+            right_mp[c] -= 1
+            for k in left_mp.keys():
+                if right_mp[k] > 0 and left_mp[k] > 0:
+                    ans[k + c + k] += 1
+            left_mp[c] += 1
 
-
-
-
-
-
+        return len(ans)
 s = Solution()
 print(s.numDecodings("226"))
