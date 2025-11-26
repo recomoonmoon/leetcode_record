@@ -1709,5 +1709,194 @@ class Solution:
             left_mp[c] += 1
 
         return len(ans)
+
+    def minimumFlips(self, n: int) -> int:
+        def get_bit(num:int):
+            ans = []
+            while num:
+                ans.append(num % 2)
+                num //= 2
+            return ans
+
+        num_list = get_bit(n)
+        length = len(num_list)
+        ans = 0
+        for i in range(length):
+            if num_list[length - i - 1] != num_list[i]:
+                ans += 1
+        return ans
+
+    def compute_peek(self, num: int):
+        ans = 0
+        pre2 = num % 10
+        pre1 = (num % 100) // 10
+        num //= 100
+        if num == 0:
+            return ans
+        else:
+            while num:
+                temp_num = num % 10
+                if pre2 < pre1 and pre1 > temp_num:
+                    ans += 1
+                pre1, pre2 = temp_num, pre1
+                num //= 10
+        return ans
+
+    def compute_valey(self, num: int):
+        ans = 0
+        pre2 = num % 10
+        pre1 = (num % 100) // 10
+        num //= 100
+        if num == 0:
+            return ans
+        else:
+            while num:
+                temp_num = num % 10
+                if pre2 > pre1 and pre1 < temp_num:
+                    ans += 1
+                pre1, pre2 = temp_num, pre1
+                num //= 10
+        return ans
+
+    def totalWaviness(self, num1: int, num2: int) -> int:
+        """
+        pad 0 1 2 ...... n
+        """
+
+        ans = 0
+        for i in range(num1, num2+1):
+            ans += self.compute_valey(i)
+            ans += self.compute_peek(i)
+        return ans
+
+    def lexSmallestNegatedPerm(self, n: int, target: int) -> List[int]:
+        maxsum = int((1 + n) * n / 2)
+        if abs(target) > maxsum or (maxsum - target) % 2 == 1:
+            return []
+        mp = defaultdict(int)
+        ed = n
+        while maxsum > target:
+            delta = (maxsum - target) // 2
+            ed = min(ed, delta)
+            mp[ed] = 1
+            maxsum -= 2 * ed
+            ed -=1
+
+        nums = [i for i in range(1, n+1)]
+        for key in mp.keys():
+            nums[key-1] *= -1
+        nums.sort()
+        return nums
+
+    def smallestRepunitDivByK(self, k: int) -> int:
+        """
+        1 % k = ?
+        10 % k = (1 % k) * 10 % k
+
+        21
+        1 + 10 + 16 + 13
+        :param k:
+        :return:
+        """
+        time = 1
+        num = 1
+
+        accu = 1
+        mp = defaultdict(int)
+        mp[1] = 1
+        if k % 2 == 0:
+            return -1
+
+        for i in range(100000):
+            if accu % k == 0:
+                return time
+            if mp[accu] > 1:
+                return -1
+            if accu % k == 0:
+                return time
+            num = (num * 10) % k
+            time += 1
+            accu += num
+            accu = accu % k
+            mp[accu] += 1
+        return -1
+
+    def countDistinct(self, n: int) -> int:
+        """
+        1-1/2-2.... : 1
+        1-10/11-20/21-30.... : 9
+        1-100 : (1-10) * 10
+        1-1000 : (1-100) * 10
+
+        :param n:
+        n = k1 * 1 + k2*10 + k3*100 。。。。。
+
+        13200
+        = 0-10000 + 3200
+        = 0-10000 + 0-1000 * 3 + 200
+
+        """
+
+        def compute(nums:List[int], deep = 1):
+
+            while nums and nums[-1] == 0:
+                return 0
+            if len(nums) == 0:
+                return 0
+            accu = 0
+            if deep == 1:
+                accu += nums[-1] * record[len(nums)-1]
+            else:
+                accu += (nums[-1]-1) * record[len(nums) - 1]
+            if not nums:
+                return  0
+            return accu + compute(nums, deep+1)
+
+        record = [1]
+        for i in range(20):
+            record.append(record[-1] * 9)
+
+        nums = []
+        while n :
+            nums.append(n % 10)
+            n //=10
+        return compute(nums)
+
+    def numberOfPaths(self, grid: List[List[int]], k: int) -> int:
+
+        q = [[0,0,grid[0][0]]]
+        m = len(grid)
+        n = len(grid[0])
+        ans = 0
+        while q:
+            x, y ,accu = q.pop(0)
+            if x == m-1 and y == n-1:
+                if accu % k == 0:
+                    ans += 1
+                continue
+            elif x == m-1:
+                q.append([x, y+1, accu + grid[x][y+1]])
+            elif y == n-1:
+                q.append([x+1, y, accu + grid[x+1][y]])
+            else:
+                q.append([x + 1, y, accu + grid[x + 1][y]])
+                q.append([x, y + 1, accu + grid[x][y + 1]])
+        return ans
+
+    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
+
+        for row_idx, row_nums in enumerate(matrix):
+            if row_nums[-1] < target:
+                continue
+            if row_nums[0] > target:
+                return False
+            idx = bisect_left(row_nums, target)
+            if idx < len(row_nums) and row_nums[idx] == target:
+                return True
+        return False
+
+    def firstMissingPositive(self, nums: List[int]) -> int:
+
+
 s = Solution()
-print(s.numDecodings("226"))
+print(s.lexSmallestNegatedPerm( n = 3, target = 0 ))
